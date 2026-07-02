@@ -1,0 +1,24 @@
+.login-page { min-height: 100vh; display: flex; }
+.login-left { flex: 1; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); padding: 48px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
+.login-brand { display: flex; align-items: center; gap: 12px; }
+.login-brand-icon { width: 52px; height: 52px; background: rgba(255,255,255,.15); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.login-brand-name { font-size: 22px; font-weight: 700; }
+.login-hero h2 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+.login-hero p { font-size: 16px; color: rgba(255,255,255,.7); line-height: 1.7; margin-bottom: 32px; }
+.login-features { display: flex; flex-direction: column; gap: 12px; }
+.login-feature { display: flex; align-items: center; gap: 12px; font-size: 15px; color: rgba(255,255,255,.85); }
+.login-feature-dot { width: 8px; height: 8px; background: var(--color-primary); border-radius: 50%; flex-shrink: 0; }
+.login-right { width: 480px; display: flex; align-items: center; justify-content: center; padding: 32px; background: var(--color-bg); }
+.login-card { width: 100%; max-width: 400px; }
+.login-card-header { text-align: center; margin-bottom: 32px; }
+.login-card-header h2 { font-size: 26px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; }
+.login-card-header p { font-size: 14px; color: var(--color-text-secondary); }
+.login-form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+.login-pwd-group { position: relative; }
+.login-toggle-pwd { position: absolute; right: 12px; top: 34px; background: none; border: none; color: var(--color-text-muted); display: flex; padding: 4px; border-radius: var(--radius-sm); transition: color var(--transition); }
+.login-toggle-pwd:hover { color: var(--color-text-primary); }
+.login-error { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px; text-align: center; }
+.login-register { text-align: center; font-size: 14px; color: var(--color-text-secondary); }
+.login-register-link { color: var(--color-primary); font-weight: 500; }
+.login-register-link:hover { text-decoration: underline; }
+@media (max-width: 768px) { .login-left { display: none; } .login-right { width: 100%; } }

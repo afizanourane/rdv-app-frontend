@@ -1,0 +1,13 @@
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.card--sm { padding: 16px; }
+.card--md { padding: 24px; }
+.card--lg { padding: 32px; }
+.card--hover { transition: box-shadow var(--transition), transform var(--transition); }
+.card--hover:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.card--clickable { cursor: pointer; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.card-header-left { display: flex; align-items: center; gap: 12px; }
+.card-icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; }
+.card-title { font-size: 16px; font-weight: 600; color: var(--color-text-primary); }
+.card-subtitle { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+.card-header-action { display: flex; align-items: center; gap: 8px; }

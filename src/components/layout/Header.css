@@ -1,0 +1,14 @@
+.header { height: 64px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-menu-btn { background: none; border: none; color: var(--color-text-secondary); padding: 8px; border-radius: var(--radius-sm); transition: all var(--transition); display: flex; }
+.header-menu-btn:hover { background: var(--color-surface-2); color: var(--color-text-primary); }
+.header-search { position: relative; display: flex; align-items: center; }
+.header-search-icon { position: absolute; left: 12px; color: var(--color-text-muted); pointer-events: none; }
+.header-search-input { padding: 8px 14px 8px 38px; border: 1.5px solid var(--color-border); border-radius: var(--radius-full); font-size: 13px; background: var(--color-surface-2); color: var(--color-text-primary); outline: none; width: 240px; transition: all var(--transition); }
+.header-search-input:focus { border-color: var(--color-primary); background: var(--color-surface); box-shadow: 0 0 0 3px var(--color-primary-light); width: 300px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.header-greeting { font-size: 14px; color: var(--color-text-secondary); }
+.header-greeting strong { color: var(--color-text-primary); }
+.header-notif-btn { position: relative; background: none; border: none; color: var(--color-text-secondary); padding: 8px; border-radius: var(--radius-md); transition: all var(--transition); display: flex; }
+.header-notif-btn:hover { background: var(--color-surface-2); color: var(--color-text-primary); }
+.header-notif-badge { position: absolute; top: 4px; right: 4px; background: var(--color-danger); color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--color-surface); }

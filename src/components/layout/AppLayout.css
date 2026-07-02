@@ -1,0 +1,4 @@
+.app-layout { display: flex; min-height: 100vh; }
+.app-main { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .25s cubic-bezier(.4,0,.2,1); }
+.app-main--collapsed { margin-left: 72px; }
+.app-content { flex: 1; padding: 28px; animation: fadeIn .2s ease; }
