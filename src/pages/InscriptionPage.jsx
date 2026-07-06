@@ -1,72 +1,70 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Phone, CalendarCheck } from 'lucide-react';
+import { Mail, Lock, User, Phone, CalendarCheck, ArrowRight } from 'lucide-react';
 import { inscrire } from '../api/auth';
-import Button from '../components/common/Button';
-import Input from '../components/common/Input';
+import { Btn, Input, Card } from '../components/common/UI';
 import toast from 'react-hot-toast';
-import './LoginPage.css';
 
 export default function InscriptionPage() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ nom: '', prenom: '', email: '', telephone: '', password: '', password_confirm: '', role: 'client' });
-  const [loading, setLoading] = useState(false);
+  const nav = useNavigate();
+  const [form, setForm]     = useState({ nom:'', prenom:'', email:'', telephone:'', password:'', password_confirm:'', role:'client' });
   const [errors, setErrors] = useState({});
-  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+  const [loading, setLoading] = useState(false);
+  const set = k => e => setForm(f=>({...f,[k]:e.target.value}));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrors({});
-    try {
-      await inscrire(form);
-      toast.success('Compte créé ! Connectez-vous.');
-      navigate('/login');
-    } catch (err) {
+  const handle = async e => {
+    e.preventDefault(); setErrors({}); setLoading(true);
+    try { await inscrire(form); toast.success('Compte créé ! Connectez-vous.'); nav('/login'); }
+    catch(err) {
       const d = err.response?.data;
       setErrors(d?.details || {});
-      toast.error(d?.erreur || 'Erreur lors de la création');
+      toast.error(d?.erreur || 'Erreur lors de la création du compte');
     } finally { setLoading(false); }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-left">
-        <div className="login-brand">
-          <div className="login-brand-icon"><CalendarCheck size={32} /></div>
-          <h1 className="login-brand-name">RendezVous</h1>
-        </div>
-        <div className="login-hero">
-          <h2>Rejoignez notre plateforme</h2>
-          <p>Créez votre compte en quelques secondes et commencez à gérer vos rendez-vous dès aujourd'hui.</p>
-        </div>
-      </div>
-      <div className="login-right">
-        <div className="login-card animate-fadeIn">
-          <div className="login-card-header">
-            <h2>Créer un compte</h2>
-            <p>Remplissez le formulaire ci-dessous</p>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:24, background:'var(--bg-main)' }}>
+      <div style={{ width:'100%', maxWidth:520 }} className="fade-up">
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:24, justifyContent:'center' }}>
+          <div style={{ width:36, height:36, background:'var(--primary)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <CalendarCheck size={18} color="#fff" />
           </div>
-          <form onSubmit={handleSubmit} className="login-form">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <Input label="Prénom" icon={User} placeholder="Jean" value={form.prenom} onChange={set('prenom')} error={errors.prenom?.[0]} />
-              <Input label="Nom"    icon={User} placeholder="Dupont" value={form.nom} onChange={set('nom')} error={errors.nom?.[0]} />
+          <span style={{ fontSize:17, fontWeight:800, color:'var(--text-1)' }}>RendezVous Pro</span>
+        </div>
+
+        <Card padding="card-p6">
+          <h2 style={{ fontSize:22, fontWeight:800, color:'var(--text-1)', marginBottom:4 }}>Créer un compte</h2>
+          <p style={{ fontSize:13, color:'var(--text-3)', marginBottom:22 }}>Rejoignez la plateforme en quelques secondes</p>
+
+          <form onSubmit={handle} style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <Input label="Prénom" icon={User} placeholder="Jean"   value={form.prenom} onChange={set('prenom')} error={errors.prenom?.[0]} />
+              <Input label="Nom"    icon={User} placeholder="Dupont" value={form.nom}    onChange={set('nom')}    error={errors.nom?.[0]} />
             </div>
-            <Input label="Email"     type="email" icon={Mail}  placeholder="jean@exemple.com" value={form.email}     onChange={set('email')}     error={errors.email?.[0]} />
-            <Input label="Téléphone" type="tel"   icon={Phone} placeholder="+237 6XX XXX XXX"  value={form.telephone} onChange={set('telephone')} error={errors.telephone?.[0]} />
-            <div className="input-group">
-              <label className="input-label">Rôle</label>
-              <select className="modal-select" value={form.role} onChange={set('role')}>
-                <option value="client">Client</option>
-                <option value="personnel">Personnel</option>
+            <Input label="Email" type="email" icon={Mail} placeholder="jean@exemple.com" value={form.email} onChange={set('email')} error={errors.email?.[0]} />
+            <Input label="Téléphone" type="tel" icon={Phone} placeholder="+237 6XX XXX XXX" value={form.telephone} onChange={set('telephone')} error={errors.telephone?.[0]} />
+
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              <label className="input-label">Je suis un(e)</label>
+              <select className="select-field" value={form.role} onChange={set('role')}>
+                <option value="client">Client — Je prends des rendez-vous</option>
+                <option value="personnel">Personnel — Je gère des créneaux</option>
               </select>
             </div>
-            <Input label="Mot de passe"   type="password" icon={Lock} placeholder="Min. 8 caractères" value={form.password}         onChange={set('password')}         error={errors.password?.[0]} />
-            <Input label="Confirmer MDP"  type="password" icon={Lock} placeholder="••••••••"            value={form.password_confirm} onChange={set('password_confirm')} />
-            <Button type="submit" fullWidth loading={loading} size="lg">Créer mon compte</Button>
+
+            <Input label="Mot de passe" type="password" icon={Lock} placeholder="Min. 8 car., 1 majuscule, 1 chiffre" value={form.password} onChange={set('password')} error={errors.password?.[0]} />
+            <Input label="Confirmer le mot de passe" type="password" icon={Lock} placeholder="••••••••" value={form.password_confirm} onChange={set('password_confirm')} />
+
+            <Btn type="submit" variant="primary" full size="lg" loading={loading}>
+              Créer mon compte <ArrowRight size={15}/>
+            </Btn>
           </form>
-          <p className="login-register">Déjà un compte ? <Link to="/login" className="login-register-link">Se connecter</Link></p>
-        </div>
+
+          <p style={{ textAlign:'center', fontSize:13, color:'var(--text-3)', marginTop:18 }}>
+            Déjà un compte ?{' '}
+            <Link to="/login" style={{ color:'var(--primary)', fontWeight:600 }}>Se connecter</Link>
+          </p>
+        </Card>
       </div>
     </div>
   );

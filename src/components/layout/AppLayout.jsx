@@ -1,17 +1,16 @@
-// src/components/layout/AppLayout.jsx
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Header from './Header';
-import './AppLayout.css';
+import Header  from './Header';
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
+  const ml = collapsed ? 72 : 240;
   return (
-    <div className="app-layout">
-      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(c => !c)} />
-      <div className={`app-main ${collapsed ? 'app-main--collapsed' : ''}`}>
-        <Header onToggleSidebar={() => setCollapsed(c => !c)} />
+    <div className="app-wrap">
+      <Sidebar collapsed={collapsed} />
+      <div className="app-main" style={{ marginLeft: ml }}>
+        <Header onToggle={() => setCollapsed(c => !c)} />
         <main className="app-content">
           <Outlet />
         </main>

@@ -1,96 +1,90 @@
 import { useEffect, useState } from 'react';
-import { Bell, CheckCheck, Check } from 'lucide-react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
 import { getNotifications, marquerLue, marquerToutesLues } from '../api/notifications';
-import Card, { CardHeader } from '../components/common/Card';
-import Button from '../components/common/Button';
-import EmptyState from '../components/common/EmptyState';
-import Spinner from '../components/common/Spinner';
-import Badge from '../components/common/Badge';
+import { extractData, formatDate } from '../utils/helpers';
+import { Btn, Spinner, Empty, Card, PageHeader } from '../components/common/UI';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import clsx from 'clsx';
-import './NotificationsPage.css';
+
+const TYPE = {
+  rendezvous: { bg:'var(--primary-50)',  color:'var(--primary)', emoji:'📅', label:'RDV' },
+  paiement:   { bg:'#ecfdf5',            color:'#10b981',        emoji:'💳', label:'Paiement' },
+  systeme:    { bg:'var(--bg-hover)',     color:'var(--text-3)',  emoji:'🔔', label:'Système' },
+};
 
 export default function NotificationsPage() {
-  const [notifs,   setNotifs]  = useState([]);
-  const [loading,  setLoading] = useState(true);
-  const [nbNonLues, setNb]     = useState(0);
+  const [notifs,  setNotifs]  = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [nb,      setNb]      = useState(0);
 
-  const fetchNotifs = async () => {
+  const fetch = async () => {
     setLoading(true);
-    try {
-      const r = await getNotifications();
-      setNotifs(r.data.notifications || []);
-      setNb(r.data.non_lues || 0);
-    } catch { toast.error('Erreur chargement'); }
+    try { const r = await getNotifications(); setNotifs(r.data.notifications||[]); setNb(r.data.non_lues||0); }
+    catch { toast.error('Erreur de chargement'); }
     finally { setLoading(false); }
   };
+  useEffect(() => { fetch(); }, []);
 
-  useEffect(() => { fetchNotifs(); }, []);
-
-  const handleMarquerLue = async (id) => {
+  const handleLire = async id => {
     await marquerLue(id);
-    setNotifs(n => n.map(x => x.id === id ? { ...x, est_lue: true } : x));
-    setNb(n => Math.max(0, n - 1));
+    setNotifs(n => n.map(x => x.id===id?{...x,est_lue:true}:x));
+    setNb(n => Math.max(0,n-1));
   };
 
   const handleToutLire = async () => {
     await marquerToutesLues();
-    setNotifs(n => n.map(x => ({ ...x, est_lue: true })));
-    setNb(0);
-    toast.success('Toutes les notifications marquées comme lues');
+    setNotifs(n => n.map(x=>({...x,est_lue:true}))); setNb(0);
+    toast.success('Toutes les notifications lues');
   };
 
-  const TYPE_COLORS = { rendezvous: 'primary', paiement: 'success', systeme: 'default' };
-
-  if (loading) return <Spinner size="lg" text="Chargement..." />;
+  if (loading) return <Spinner text="Chargement…" />;
 
   return (
-    <div className="notif-page animate-fadeIn">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Notifications</h1>
-          <p className="page-subtitle">{nbNonLues} non lue{nbNonLues > 1 ? 's' : ''}</p>
-        </div>
-        {nbNonLues > 0 && (
-          <Button icon={CheckCheck} variant="secondary" onClick={handleToutLire}>
-            Tout marquer comme lu
-          </Button>
-        )}
-      </div>
-
-      <Card padding="sm">
+    <div className="fade-up">
+      <PageHeader title="Notifications" subtitle={`${nb} non lue${nb>1?'s':''}`}
+        action={nb>0 && <Btn icon={CheckCheck} variant="secondary" onClick={handleToutLire}>Tout marquer lu</Btn>}
+      />
+      <Card padding="card-p0" style={{ padding:0 }}>
         {notifs.length === 0 ? (
-          <EmptyState icon={Bell} title="Aucune notification" description="Vous n'avez pas encore de notifications." />
-        ) : (
-          <div className="notif-list">
-            {notifs.map(n => (
-              <div key={n.id} className={clsx('notif-item', !n.est_lue && 'notif-item--unread')}>
-                <div className="notif-dot-wrap">
-                  {!n.est_lue && <span className="notif-dot" />}
-                </div>
-                <div className="notif-content">
-                  <div className="notif-header">
-                    <h4 className="notif-title">{n.titre}</h4>
-                    <div className="notif-meta">
-                      <Badge variant={TYPE_COLORS[n.type_notification]} size="sm">{n.type_notification}</Badge>
-                      <span className="notif-date">
-                        {format(new Date(n.date_creation), 'd MMM à HH:mm', { locale: fr })}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="notif-message">{n.message}</p>
-                </div>
-                {!n.est_lue && (
-                  <button className="notif-lire-btn" onClick={() => handleMarquerLue(n.id)} title="Marquer comme lu">
-                    <Check size={16} />
-                  </button>
-                )}
+          <Empty icon={Bell} title="Aucune notification" desc="Vous n'avez aucune notification." />
+        ) : notifs.map((n, i) => {
+          const t = TYPE[n.type_notification] || TYPE.systeme;
+          return (
+            <div key={n.id} style={{
+              display:'flex', alignItems:'flex-start', gap:14,
+              padding:'16px 20px',
+              borderBottom: i<notifs.length-1 ? '1px solid var(--border)' : 'none',
+              background: n.est_lue ? 'transparent' : 'rgba(16,185,129,.03)',
+              transition:'background .15s',
+            }}>
+              <div style={{ width:40, height:40, borderRadius:12, background:t.bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
+                {t.emoji}
               </div>
-            ))}
-          </div>
-        )}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, marginBottom:4, flexWrap:'wrap' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    {!n.est_lue && <span style={{ width:7, height:7, background:'var(--primary)', borderRadius:'50%', display:'inline-block' }} />}
+                    <span style={{ fontSize:13.5, fontWeight:700, color:'var(--text-1)' }}>{n.titre}</span>
+                    <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:50, background:t.bg, color:t.color }}>{t.label}</span>
+                  </div>
+                  <span style={{ fontSize:11, color:'var(--text-4)' }}>{formatDate(n.date_creation)}</span>
+                </div>
+                <p style={{ fontSize:13, color:'var(--text-3)', lineHeight:1.5 }}>{n.message}</p>
+              </div>
+              {!n.est_lue && (
+                <button onClick={() => handleLire(n.id)} style={{
+                  width:28, height:28, borderRadius:8, border:'1.5px solid var(--border)',
+                  color:'var(--text-4)', display:'flex', alignItems:'center', justifyContent:'center',
+                  flexShrink:0, cursor:'pointer', background:'none', transition:'all .15s',
+                }}
+                onMouseOver={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.color='var(--primary)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--text-4)'; }}
+                >
+                  <Check size={14} />
+                </button>
+              )}
+            </div>
+          );
+        })}
       </Card>
     </div>
   );

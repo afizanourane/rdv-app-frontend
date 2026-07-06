@@ -1,97 +1,153 @@
-// src/App.jsx — Routeur principal
+import MotDePasseOubliePage from './pages/MotDePasseOubliePage';
+import ResetPasswordPage    from './pages/ResetPasswordPage';
 
-// AVANT (react-scripts)
-import './styles/globals.css';
 
-// APRÈS (Vite — même chose, ça marche pareil)
-import './styles/globals.css';
+import CalendrierPage from './pages/CalendrierPage';
+
+import StatistiquesPage from './pages/StatistiquesPage';
+
+
+
+
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import AppLayout from './components/layout/AppLayout';
-import LoginPage from './pages/LoginPage';
-import InscriptionPage from './pages/InscriptionPage';
-import DashboardPage from './pages/DashboardPage';
-import RendezVousPage from './pages/RendezVousPage';
+import { ThemeProvider } from './context/ThemeContext';
+import AppLayout         from './components/layout/AppLayout';
+import LandingPage       from './pages/LandingPage';
+import LoginPage         from './pages/LoginPage';
+import InscriptionPage   from './pages/InscriptionPage';
+import DashboardPage     from './pages/DashboardPage';
+import RendezVousPage    from './pages/RendezVousPage';
+import CreneauxPage      from './pages/CreneauxPage';
+import EntreprisesPage   from './pages/EntreprisesPage';
+import PaiementsPage     from './pages/PaiementsPage';
 import NotificationsPage from './pages/NotificationsPage';
-import Spinner from './components/common/Spinner';
-import './styles/globals.css';
+import UtilisateursPage  from './pages/UtilisateursPage';
+import ProfilPage        from './pages/ProfilPage';
 
-// Route protégée — redirige vers /login si non connecté
-function PrivateRoute({ children }) {
+// ── Guards ────────────────────────────────────────────────────
+
+function Private({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}><Spinner size="lg" text="Chargement..." /></div>;
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: 16, fontFamily: 'Inter,sans-serif', background: 'var(--bg-main)' }}>
+      <div style={{ width: 40, height: 40, border: '3px solid var(--border)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+      <p style={{ color: 'var(--text-3)', fontSize: 14 }}>Chargement…</p>
+    </div>
+  );
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// Route publique — redirige vers /dashboard si déjà connecté
-function PublicRoute({ children }) {
+function Public({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   return !user ? children : <Navigate to="/dashboard" replace />;
 }
 
+// Admin only — redirige les non-admins vers dashboard
+function AdminOnly({ children }) {
+  const { user, isAdmin } = useAuth();
+  if (!user)    return <Navigate to="/login"     replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
+// Personnel ne peut pas accéder à certaines pages
+function NotPersonnel({ children }) {
+  const { user, isPersonnel } = useAuth();
+  if (!user)       return <Navigate to="/login"     replace />;
+  if (isPersonnel) return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
+// ── Routes ────────────────────────────────────────────────────
+
 function AppRoutes() {
   return (
     <Routes>
-      {/* Routes publiques */}
-      <Route path="/login"       element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/inscription" element={<PublicRoute><InscriptionPage /></PublicRoute>} />
+      {/* Pages publiques */}
+      <Route path="/"            element={<LandingPage />} />
+      <Route path="/login"       element={<Public><LoginPage /></Public>} />
+      <Route path="/inscription" element={<Public><InscriptionPage /></Public>} />
 
-      {/* Routes protégées */}
-      <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>
+      {/*Mot de passe oublier*/}
+      <Route path="/mot-de-passe-oublie"    element={<Public><MotDePasseOubliePage /></Public>} />
+      <Route path="/reset-password/:token"  element={<Public><ResetPasswordPage />   </Public>} />
+
+      {/* Pages protégées dans le layout */}
+      <Route element={<Private><AppLayout /></Private>}>
+
+        {/* Toutes les pages connectées */}
         <Route path="/dashboard"     element={<DashboardPage />} />
-        <Route path="/rendezvous"    element={<RendezVousPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/profil"        element={<ProfilPage />} />
 
-        {/* Placeholder pages */}
-        <Route path="/creneaux"    element={<PlaceholderPage title="Créneaux" />} />
-        <Route path="/entreprises" element={<PlaceholderPage title="Entreprises" />} />
-        <Route path="/paiements"   element={<PlaceholderPage title="Paiements" />} />
-        <Route path="/users"       element={<PlaceholderPage title="Utilisateurs" />} />
-        <Route path="/profil"      element={<PlaceholderPage title="Mon profil" />} />
+        {/* RDV : tous les rôles voient la page, actions filtrées par rôle */}
+        <Route path="/rendezvous"    element={<RendezVousPage />} />
+
+        {/* Créneaux : tous les rôles, actions filtrées par rôle */}
+        <Route path="/creneaux"      element={<CreneauxPage />} />
+
+        {/* Entreprises : client et admin (pas le personnel) */}
+        <Route path="/entreprises"   element={
+          <NotPersonnel><EntreprisesPage /></NotPersonnel>
+        } />
+
+        {/* Paiements : client et admin (pas le personnel) */}
+        <Route path="/paiements"     element={
+          <NotPersonnel><PaiementsPage /></NotPersonnel>
+        } />
+
+
+        {/* Calendrier visuel */}
+        <Route path="/calendrier" element={<CalendrierPage />} />
+
+        {/* Dans les routes admin :*/} 
+        <Route path="/statistiques" element={
+          <AdminOnly><StatistiquesPage /></AdminOnly>} />
+
+
+        {/* Utilisateurs : ADMIN seulement */}
+        <Route path="/utilisateurs"  element={
+          <AdminOnly><UtilisateursPage /></AdminOnly>
+        } />
       </Route>
 
-      {/* Redirections */}
-      <Route path="/"  element={<Navigate to="/dashboard" replace />} />
-      <Route path="*"  element={<Navigate to="/dashboard" replace />} />
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
-}
 
-// Page simple pour les sections non encore développées
-function PlaceholderPage({ title }) {
-  return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '12px' }}>{title}</h1>
-      <p style={{ color: 'var(--color-text-secondary)' }}>Cette section sera disponible prochainement.</p>
-    </div>
+    
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: 'var(--color-surface)',
-              color: 'var(--color-text-primary)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '10px',
-              boxShadow: 'var(--shadow-lg)',
-              fontSize: '14px',
-            },
-            success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
-            error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
-          }}
-        />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background:   'var(--bg-card)',
+                color:        'var(--text-1)',
+                border:       '1px solid var(--border)',
+                borderRadius: '12px',
+                boxShadow:    'var(--shadow-lg)',
+                fontSize:     '13.5px',
+                fontFamily:   'Inter, sans-serif',
+              },
+              success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
+              error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+            }}
+          />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

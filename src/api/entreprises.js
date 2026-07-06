@@ -1,6 +1,5 @@
-// src/api/entreprises.js
 import api from './client';
-export const getEntreprises = (params) => api.get('/entreprises/', { params });
-export const creerEntreprise = (data) => api.post('/entreprises/', data);
-export const getDomaines = () => api.get('/domaines/');
-export const laisserAvis = (data) => api.post('/avis/', data);
+export const getEntreprises  = (p) => api.get('/entreprises/', { params: p });
+export const creerEntreprise = (d) => api.post('/entreprises/', d);
+export const getDomaines     = ()  => api.get('/domaines/');
+export const laisserAvis     = (d) => api.post('/avis/', d);
