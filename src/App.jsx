@@ -26,6 +26,10 @@ import PaiementsPage     from './pages/PaiementsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import UtilisateursPage  from './pages/UtilisateursPage';
 import ProfilPage        from './pages/ProfilPage';
+import PriseRendezVousPage from './pages/PriseRendezVousPage';
+import DomainesPage   from './pages/DomainesPage';
+import PersonnelsPage from './pages/PersonnelsPage';
+import ChatPage from './pages/ChatPage';
 
 // ── Guards ────────────────────────────────────────────────────
 
@@ -87,6 +91,10 @@ function AppRoutes() {
         {/* RDV : tous les rôles voient la page, actions filtrées par rôle */}
         <Route path="/rendezvous"    element={<RendezVousPage />} />
 
+        {/* Prise de RDV — CLIENT SEULEMENT (pas le personnel) */}
+        <Route path="/prendre-rdv" element={
+        <NotPersonnel><PriseRendezVousPage /></NotPersonnel>} />
+
         {/* Créneaux : tous les rôles, actions filtrées par rôle */}
         <Route path="/creneaux"      element={<CreneauxPage />} />
 
@@ -100,7 +108,12 @@ function AppRoutes() {
           <NotPersonnel><PaiementsPage /></NotPersonnel>
         } />
 
+        {/* Domaines — tous les connectés */}
+        <Route path="/domaines" element={<DomainesPage />} />
 
+        {/* Personnels — admin seulement */}
+        <Route path="/personnels" element={
+          <AdminOnly><PersonnelsPage /></AdminOnly>} />
         {/* Calendrier visuel */}
         <Route path="/calendrier" element={<CalendrierPage />} />
 
@@ -108,7 +121,7 @@ function AppRoutes() {
         <Route path="/statistiques" element={
           <AdminOnly><StatistiquesPage /></AdminOnly>} />
 
-
+        
         {/* Utilisateurs : ADMIN seulement */}
         <Route path="/utilisateurs"  element={
           <AdminOnly><UtilisateursPage /></AdminOnly>
@@ -117,6 +130,8 @@ function AppRoutes() {
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Chat — tous les rôles connectés */}
+      <Route path="/chat" element={<ChatPage />} />
     </Routes>
 
     

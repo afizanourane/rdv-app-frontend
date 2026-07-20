@@ -91,8 +91,23 @@ export default function CreneauxPage() {
             <tbody>
               {creneaux.map(c => (
                 <tr key={c.id}>
-                  <td className="td-bold" style={{ color: 'var(--primary)' }}>#{c.id}</td>
-                  <td>Personnel #{c.personnel}</td>
+                  <td style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                        {c.jour_semaine || '—'}
+                  </td>
+                  <td><div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>
+                      {c.personnel_nom || `Personnel #${c.personnel}`}
+                    </div>
+                    {c.entreprise_nom && (
+                      <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
+                        {c.entreprise_nom}
+                      </div>
+                    )}
+                    {c.domaine_nom && (
+                      <div style={{ fontSize: 11, color: 'var(--primary)', marginTop: 1 }}>
+                        {c.domaine_nom}
+                      </div>
+                    )}
+                  </td>
                   <td className="td-bold">{formatHeure(c.heure_debut)}</td>
                   <td className="td-bold">{formatHeure(c.heure_fin)}</td>
                   <td><Badge statut={c.statut} /></td>

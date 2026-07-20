@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   Calendar, Plus, CheckCircle, XCircle,
-  Ban, Search, Filter, Download, X,
+  Ban, Search, Filter, Download, X, MessageCircle
 } from 'lucide-react';
 import { useAuth }   from '../context/AuthContext';
 import { getRdvs, traiterRdv, annulerRdv, creerRdv, exportRdvsCsv } from '../api/rendezvous';
@@ -107,7 +107,7 @@ export default function RendezVousPage() {
     setSub(true);
     try {
       await creerRdv({ creneau_id: parseInt(newRdv.creneau_id), description: newRdv.description });
-      toast.success('🎉 RDV créé ! Email de confirmation envoyé.', { duration: 5000 });
+      toast.success(' RDV créé ! Email de confirmation envoyé.', { duration: 5000 });
       setModCreer(false); setNewRdv({ creneau_id: '', description: '' }); fetchRdvs();
     } catch(e) {
       if (e.response?.status === 500) {
@@ -332,7 +332,8 @@ export default function RendezVousPage() {
           <table className="data-tbl">
             <thead>
               <tr>
-                {['#', 'Client', 'Description', 'Statut', 'Date', 'Actions'].map(h => (
+                {['#', 'Client', 'Personnel', 'Service', 'Montant', 'Créneau', 'Description', 'Statut', 'Date', 'Actions'].map(h => (
+  
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -342,14 +343,83 @@ export default function RendezVousPage() {
                 <tr key={rdv.id}>
                   <td className="td-bold" style={{ color: 'var(--primary)' }}>#{rdv.id}</td>
                   <td className="td-bold">{rdv.client_nom || `Client #${rdv.client}`}</td>
-                  <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: 'var(--text-3)' }}>
+
+                    {/* Colonne Personnel + Entreprise */}
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    {rdv.personnel_nom ? (
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>
+                          {rdv.personnel_nom}
+                        </div>
+                        {rdv.entreprise_nom && (
+                          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
+                            {rdv.entreprise_nom}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                    )}
+                  </td>
+                  {/* Service choisi */}
+                  {/* Service choisi */}
+                  <td>
+                    {rdv.service_nom ? (
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>
+                          {rdv.service_nom}
+                        </div>
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                    )}
+                  </td>
+
+                  {/* Montant */}
+                  <td>
+                    {rdv.prix_snapshot ? (
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)' }}>
+                        {parseInt(rdv.prix_snapshot).toLocaleString('fr-FR')} FCFA
+                      </span>
+                    ) : rdv.service_prix ? (
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)' }}>
+                        {parseInt(rdv.service_prix).toLocaleString('fr-FR')} FCFA
+                      </span>
+                    ) : (
+                      <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                    )}
+                  </td>
+                  {/* Créneau choisi */}
+                  <td>
+                    {rdv.creneau_heure_debut ? (
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>
+                          {rdv.creneau_heure_debut} – {rdv.creneau_heure_fin}
+                        </div>
+                        {rdv.creneau_jour && (
+                          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
+                            {rdv.creneau_jour}
+                          </div>
+                        )}
+                        {!rdv.creneau_jour && rdv.creneau_date && (
+                          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
+                            {rdv.creneau_date}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                    )}
+                  </td>
+
+                  <td style={{ maxWidth: 250, fontSize: 12, color: 'var(--text-3)', lineHeight: 1.5 }}>
                     {rdv.description || '—'}
                   </td>
                   <td><Badge statut={rdv.statut} /></td>
                   <td style={{ fontSize: 12, color: 'var(--text-3)' }}>{formatDate(rdv.date_creation)}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      {isAdmin && rdv.statut === 'en_attente' && (
+                      {(isAdmin || isPersonnel) && rdv.statut === 'en_attente' && (
                         <>
                           <Btn size="sm" variant="success" icon={CheckCircle}
                             onClick={() => { setSelected(rdv); setAction('confirmer'); setMotif(''); setModTraiter(true); }}>
@@ -364,6 +434,12 @@ export default function RendezVousPage() {
                       {isClient && rdv.statut === 'en_attente' && (
                         <Btn size="sm" variant="ghost" icon={Ban} onClick={() => handleAnnuler(rdv)}>
                           Annuler
+                        </Btn>
+                      )}
+                      {isClient && rdv.statut === 'confirme' && (
+                        <Btn size="sm" variant="ghost" icon={MessageCircle}
+                          onClick={() => window.location.href = '/chat'}>
+                          Discuter
                         </Btn>
                       )}
                       {rdv.statut === 'refuse' && rdv.motif_refus && (

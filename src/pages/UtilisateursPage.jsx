@@ -249,10 +249,7 @@ export default function UtilisateursPage() {
                   <td style={{ fontSize: 12, color: 'var(--text-3)' }}>{formatDate(u.date_joined)}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 5 }}>
-                      <Btn size="sm" variant="secondary" icon={Edit2}
-                        onClick={() => openModifier(u)}>
-                        Modifier
-                      </Btn>
+                      
                       <Btn size="sm" variant="ghost" icon={Power}
                         onClick={() => handleActiver(u)}>
                         {u.is_active ? 'Désactiver' : 'Activer'}

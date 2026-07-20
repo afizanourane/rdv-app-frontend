@@ -40,7 +40,7 @@ export default function LandingPage() {
         <div style={{ position:'absolute', top:'5%', right:'-5%', width:500, height:500, borderRadius:'50%', background:'radial-gradient(circle,rgba(16,185,129,.2) 0%,transparent 70%)', filter:'blur(60px)', pointerEvents:'none' }} />
         <div style={{ maxWidth:1200, margin:'0 auto', position:'relative', textAlign:'center' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#ecfdf5', border:'1px solid #a7f3d0', borderRadius:50, padding:'6px 18px', marginBottom:28, fontSize:13, fontWeight:600, color:'#065f46' }}>
-            ⚡ Plateforme professionnelle de gestion de rendez-vous
+             Plateforme professionnelle de gestion de rendez-vous
           </div>
           <h1 style={{ fontSize:58, fontWeight:800, lineHeight:1.1, marginBottom:20 }}>
             Gérez vos rendez-vous

@@ -23,6 +23,17 @@ export const modifierUtilisateur  = (id, data)=> api.put(`/users/${id}/`, data);
 export const supprimerUtilisateur = (id)      => api.delete(`/users/${id}/`);
 export const activerUtilisateur   = (id)      => api.post(`/users/${id}/activer/`);
 
+//2FA
+export const verifierOtp  = (data) => api.post('/auth/verifier-otp/', data);
+export const activer2FA   = ()     => api.post('/auth/activer-2fa/');
+export const uploadPhoto  = (file) => {
+  const fd = new FormData();
+  fd.append('photo', file);
+  return api.patch('/users/moi/', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
 // PDF reçu
 export const telechargerRecu = (paiement_id) => {
   const token = localStorage.getItem('access_token');

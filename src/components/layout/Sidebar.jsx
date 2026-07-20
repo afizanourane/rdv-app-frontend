@@ -5,18 +5,21 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   CalendarCheck, LayoutDashboard, Calendar, Clock,
-  Building2, CreditCard, Bell, Users, LogOut, Settings, ChevronRight, BarChart2
+  Building2, CreditCard, Bell, Users, LogOut, Settings, ChevronRight, BarChart2,
+  Layers, MessageCircle 
 } from 'lucide-react';
 
 // Navigation strictement filtrée par rôle
 const NAV = {
   client: [
     { to: '/dashboard',     icon: LayoutDashboard, label: 'Tableau de bord' },
+    { to: '/prendre-rdv',   icon: CalendarCheck,   label: 'Prendre un RDV', section: 'Mon espace' },
     { to: '/rendezvous',    icon: Calendar,        label: 'Mes rendez-vous',  section: 'Mon espace' },
     { to: '/creneaux',      icon: Clock,           label: 'Créneaux dispo.' },
     { to: '/entreprises',   icon: Building2,       label: 'Entreprises' },
     { to: '/paiements',     icon: CreditCard,      label: 'Mes paiements' },
     { to: '/notifications', icon: Bell,            label: 'Notifications' },
+    { to: '/domaines', icon: Layers, label: 'Domaines' },
     
       // Dans NAV.client, NAV.personnel, NAV.admin :
     { to: '/calendrier', icon: CalendarCheck, label: 'Calendrier' },
@@ -38,11 +41,13 @@ const NAV = {
     { to: '/paiements',     icon: CreditCard,      label: 'Paiements' },
     { to: '/utilisateurs',  icon: Users,           label: 'Utilisateurs',    section: 'Administration' },
     { to: '/notifications', icon: Bell,            label: 'Notifications' },
-    
+    { to: '/personnels', icon: Users,   label: 'Personnels',  section: 'Administration' },
+    { to: '/domaines',   icon: Layers,  label: 'Domaines' },
     { to: '/statistiques', icon: BarChart2, label: 'Statistiques', section: 'Administration' },
 
         // Dans NAV.client, NAV.personnel, NAV.admin :
     { to: '/calendrier', icon: CalendarCheck, label: 'Calendrier' },
+    { to: '/chat', icon: MessageCircle, label: 'Messages' },
   ],
 };
 

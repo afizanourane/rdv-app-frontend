@@ -49,7 +49,7 @@ export default function DashboardPage() {
   return (
     <div className="fade-up">
       <PageHeader
-        title={`Bonjour, ${user?.prenom} 👋`}
+        title={`Bonjour, ${user?.prenom} `}
         subtitle={new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
       />
 

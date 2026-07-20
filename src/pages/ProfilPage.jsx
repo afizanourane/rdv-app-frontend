@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { User, Mail, Phone, Lock, Save, Shield } from 'lucide-react';
+import { User, Mail, Phone, Lock, Save, Shield, ShieldCheck, ShieldOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateMonProfil, changerMdp } from '../api/auth';
 import { Btn, Input, Card, PageHeader, Badge } from '../components/common/UI';
 import toast from 'react-hot-toast';
+
+
+import { activer2FA } from '../api/auth';
+
+
 
 export default function ProfilPage() {
   const { user } = useAuth();
@@ -34,35 +39,63 @@ export default function ProfilPage() {
 
   const initials = user ? `${user.prenom?.[0]||''}${user.nom?.[0]||''}`.toUpperCase() : '?';
 
+
+  const [deux_fa, setDeuxFa] = useState(user?.deux_fa_active || false);
+  const [toggling, setToggling] = useState(false);
+
+  const handleToggle2FA = async () => {
+    setToggling(true);
+    try {
+      const { data } = await activer2FA();
+      setDeuxFa(data.deux_fa_active);
+      toast.success(data.message);
+    } catch { toast.error('Erreur'); }
+    finally { setToggling(false); }
+  };
+
+
+
+
   return (
     <div className="fade-up">
       <PageHeader title="Mon profil" subtitle="Gérez vos informations personnelles" />
       <div style={{ display:'grid', gridTemplateColumns:'300px 1fr', gap:20 }}>
         {/* Carte profil */}
+
+        
         <Card padding="card-p6">
-          <div style={{ textAlign:'center' }}>
-            <div style={{ width:72, height:72, borderRadius:20, background:'linear-gradient(135deg,var(--primary),var(--accent))', color:'#fff', fontSize:28, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
-              {initials}
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-1)', marginBottom: 20, paddingBottom: 12, borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Shield size={16} style={{ color: deux_fa ? '#10b981' : 'var(--text-4)' }} />
+            Authentification à deux facteurs (2FA)
+          </h3>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>
+                {deux_fa ? '✅ 2FA activée' : '⚪ 2FA désactivée'}
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>
+                {deux_fa
+                  ? 'Un code sera envoyé par email à chaque connexion.'
+                  : 'Activez pour sécuriser davantage votre compte.'
+                }
+              </p>
             </div>
-            <h3 style={{ fontSize:17, fontWeight:700, color:'var(--text-1)' }}>{user?.prenom} {user?.nom}</h3>
-            <p style={{ fontSize:13, color:'var(--text-3)', margin:'4px 0 12px' }}>{user?.email}</p>
-            <Badge statut={user?.role} />
+
+            <Btn
+              variant={deux_fa ? 'danger' : 'success'}
+              icon={deux_fa ? ShieldOff : ShieldCheck}
+              loading={toggling}
+              onClick={handleToggle2FA}>
+              {deux_fa ? 'Désactiver' : 'Activer'}
+            </Btn>
           </div>
-          <div style={{ marginTop:24, borderTop:'1px solid var(--border)', paddingTop:16 }}>
-            {[
-              { icon:Mail,  label:'Email',     val:user?.email },
-              { icon:Phone, label:'Téléphone', val:user?.telephone||'—' },
-              { icon:Shield,label:'Rôle',      val:user?.role },
-            ].map(r => (
-              <div key={r.label} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom:'1px solid var(--border)' }}>
-                <r.icon size={14} style={{ color:'var(--text-4)', flexShrink:0 }} />
-                <div>
-                  <p style={{ fontSize:10, color:'var(--text-4)', textTransform:'uppercase', letterSpacing:'.06em' }}>{r.label}</p>
-                  <p style={{ fontSize:13, fontWeight:500, color:'var(--text-1)', textTransform:'capitalize' }}>{r.val}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+
+          {deux_fa && (
+            <div style={{ background: 'rgba(16,185,129,.08)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: 'var(--text-2)' }}>
+              🔐 À chaque connexion, vous recevrez un code à 6 chiffres valable 10 minutes sur <strong>{user?.email}</strong>.
+            </div>
+          )}
         </Card>
 
         {/* Formulaires */}
